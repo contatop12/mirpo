@@ -1,0 +1,23 @@
+{
+  // Mirpo — site estático servido pelo Cloudflare Workers (Static Assets, sem código de Worker).
+  // `npx wrangler deploy` roda o build (npm run build → ./dist) e publica.
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Precisa ser igual ao nome do Worker no painel da Cloudflare (Workers Builds valida isso).
+  "name": "mirpo",
+  "compatibility_date": "2026-11-06",
+  // `wrangler deploy` / `wrangler dev` geram o dist antes (funciona mesmo sem Build command no painel)
+  "build": {
+    "command": "npm run build",
+    "watch_dir": ["src", "assets-src", "scripts"]
+  },
+  "assets": {
+    "directory": "./dist",
+    // /pistoes → /pistoes/ ; /pistoes/index.html → /pistoes/
+    "html_handling": "auto-trailing-slash",
+    // URL inexistente → dist/404.html com status 404
+    "not_found_handling": "404-page"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

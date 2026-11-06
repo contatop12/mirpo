@@ -1,0 +1,27 @@
+{
+  "name": "mirpo-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site estático da Mirpo Distribuidora de Peças para Motores — HTML, CSS e TypeScript.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "build": "node scripts/build.ts",
+    "dev": "node scripts/build.ts --watch --serve",
+    "preview": "node scripts/serve.ts",
+    "typecheck": "tsc --noEmit",
+    "images": "node scripts/build.ts --images-only",
+    "deploy": "wrangler deploy",
+    "cf:dev": "wrangler dev",
+    "cf:check": "wrangler deploy --dry-run"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "esbuild": "^0.28.2",
+    "sharp": "^0.35.5",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.158.0"
+  }
+}
