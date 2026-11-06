@@ -1,6 +1,6 @@
 /**
- * Formulário de orçamento: valida, monta a mensagem e envia pelo WhatsApp
- * ou e-mail (ou para um endpoint, se configurado em src/data/site.ts).
+ * Formulário de orçamento: valida, registra o pedido no endpoint (src/data/site.ts →
+ * Worker /api/orcamento → n8n) e abre o WhatsApp ou o e-mail com a mensagem pronta.
  */
 import { toast, track } from './util.ts';
 
@@ -97,7 +97,7 @@ export const initForms = (): void => {
       track('form_start', { form: form.closest('section')?.id ?? 'orcamento' });
     });
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
       const submitter = (e as SubmitEvent).submitter as HTMLButtonElement | null;
       const channel = submitter?.value === 'email' ? 'email' : 'whatsapp';
@@ -124,21 +124,18 @@ export const initForms = (): void => {
       const message = buildMessage(data);
       track('generate_lead', { method: channel });
 
+      // Registra o pedido (Worker → n8n → Pulseboard) sem esperar a resposta:
+      // keepalive garante o envio mesmo abrindo o WhatsApp/e-mail em seguida, e abrir a
+      // janela ainda dentro do clique evita o bloqueador de pop-up.
       if (cfg?.endpoint) {
-        try {
-          const res = await fetch(cfg.endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...Object.fromEntries(data), pecas: data.getAll('pecas'), canal: channel, pagina: location.href }),
-          });
-          if (res.ok) {
-            toast('Pedido enviado. A equipe responde no horário comercial.');
-            form.reset();
-            return;
-          }
-        } catch {
-          /* segue pelo WhatsApp/e-mail */
-        }
+        fetch(cfg.endpoint, {
+          method: 'POST',
+          keepalive: true,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...Object.fromEntries(data), pecas: data.getAll('pecas'), canal: channel, pagina: location.href }),
+        }).catch(() => {
+          /* o pedido segue pelo WhatsApp/e-mail de qualquer forma */
+        });
       }
 
       if (channel === 'email') {

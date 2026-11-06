@@ -13,7 +13,7 @@ npm run typecheck  # checagem de tipos (tsc)
 npm run cf:dev     # build + servidor local do Cloudflare Workers (http://localhost:8787)
 npm run cf:check   # build + deploy simulado (valida config, _headers e _redirects)
 npm run deploy     # build + publica no Cloudflare Workers (pede login)
-```
+```text
 
 Requer Node 22.18+ (os scripts `.ts` rodam direto no Node, sem transpilar). `.node-version` fixa o Node 24.
 
@@ -35,8 +35,17 @@ As URLs são as mesmas do site antigo (`/pistoes/`, `/a-empresa/` etc.), então 
 
 ## Formulário de orçamento
 
-Sem backend: o formulário valida os dados e abre o **WhatsApp** (ou o e-mail) com a mensagem pronta.
-Para receber os pedidos num sistema (n8n, Formspree, CRM), preencha `integrations.formEndpoint` em `src/data/site.ts`; o site passa a enviar um `POST` em JSON e usa o WhatsApp só como alternativa.
+Ao enviar, o formulário faz duas coisas: registra o pedido e abre o **WhatsApp** (ou o e-mail) com a mensagem pronta.
+
+```
+navegador ──POST /api/orcamento──▶ Worker (src/worker/index.ts) ──X-Mirpo-Token──▶ n8n ──▶ Pulseboard
+```
+
+- **Worker** (`/api/orcamento`): aceita só JSON do próprio site, descarta robôs (campo escondido `empresa_site`), limita 5 envios/min por IP, filtra os campos e repassa ao n8n.
+- **n8n**: fluxo "P12 Mirpo — Formulário de Orçamento (Site)" (`/webhook/mirpo-orcamento`, protegido pela credencial Header Auth "Mirpo Site → n8n"). Normaliza o telefone (`5511999998888`), valida e envia ao Pulseboard (`/leads/mirpo`). Erros vão por e-mail para `danilo@p12digital.com.br`.
+- **Teste**: um nome começando com `TESTE P12` percorre todo o caminho, mas não chega ao Pulseboard.
+- **Configuração**: `N8N_WEBHOOK_URL` fica em `vars` no `wrangler.jsonc`; o token fica no secret `N8N_WEBHOOK_TOKEN` do Worker (Settings → Variables and Secrets). Para testar localmente, o mesmo token vai em `.dev.vars` (fora do git) e roda com `npm run cf:dev`.
+- Sem o secret, `/api/orcamento` responde 503 e o formulário continua abrindo o WhatsApp/e-mail normalmente.
 
 ## O que o build entrega
 

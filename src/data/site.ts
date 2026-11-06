@@ -55,10 +55,10 @@ export const integrations = {
   gtmId: 'GTM-5KSN5SF',
   googleSiteVerification: 'lhaDFAsvK_4zKgsGCAYMhQ-t8MhbhbCwBgNJ0p2jIOQ',
   /**
-   * Endpoint opcional para o formulário (ex.: webhook n8n, Formspree).
-   * Vazio = o formulário monta a mensagem e abre o WhatsApp/e-mail.
+   * Onde o formulário registra cada pedido (POST JSON). '/api/orcamento' é o Worker
+   * (src/worker/index.ts), que repassa ao n8n → Pulseboard. Vazio = só abre WhatsApp/e-mail.
    */
-  formEndpoint: '',
+  formEndpoint: '/api/orcamento',
 } as const;
 
 export const yearsActive = (now = new Date()): number => {

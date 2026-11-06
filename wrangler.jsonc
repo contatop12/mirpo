@@ -1,9 +1,10 @@
 {
-  // Mirpo — site estático servido pelo Cloudflare Workers (Static Assets, sem código de Worker).
+  // Mirpo — site estático (dist/) no Cloudflare Workers + API do formulário em /api/*.
   // `npx wrangler deploy` roda o build (npm run build → ./dist) e publica.
   "$schema": "./node_modules/wrangler/config-schema.json",
   // Precisa ser igual ao nome do Worker no painel da Cloudflare (Workers Builds valida isso).
   "name": "mirpo",
+  "main": "src/worker/index.ts",
   "compatibility_date": "2026-11-06",
   // `wrangler deploy` / `wrangler dev` geram o dist antes (funciona mesmo sem Build command no painel)
   "build": {
@@ -15,8 +16,22 @@
     // /pistoes → /pistoes/ ; /pistoes/index.html → /pistoes/
     "html_handling": "auto-trailing-slash",
     // URL inexistente → dist/404.html com status 404
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    // Só /api/* executa o Worker; o resto sai direto dos arquivos estáticos
+    "run_worker_first": ["/api/*"]
   },
+  "vars": {
+    // Fluxo n8n "P12 Mirpo — Formulário de Orçamento (Site)". O token vai no secret N8N_WEBHOOK_TOKEN.
+    "N8N_WEBHOOK_URL": "https://n8n.sitespdoze.com.br/webhook/mirpo-orcamento"
+  },
+  // Anti-spam: até 5 envios por minuto por IP
+  "ratelimits": [
+    {
+      "name": "LEADS_RATE",
+      "namespace_id": "1201",
+      "simple": { "limit": 5, "period": 60 }
+    }
+  ],
   "observability": {
     "enabled": true
   }

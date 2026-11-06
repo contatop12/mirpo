@@ -353,7 +353,7 @@ ${pageHero({ crumbs, title: 'Política de privacidade', lede: 'Como tratamos os 
     <h2>Para que usamos</h2>
     <p>Os dados servem exclusivamente para responder ao seu pedido de orçamento ou contato. Não vendemos nem compartilhamos seus dados com terceiros para fins comerciais.</p>
     <h2>Como o envio funciona</h2>
-    <p>Ao enviar pelo WhatsApp ou por e-mail, a mensagem é montada no seu próprio aparelho e enviada pelo aplicativo que você escolher. O site não armazena o conteúdo do formulário em servidores próprios. Para agilizar pedidos futuros, nome, telefone, e-mail e cidade podem ficar salvos apenas no seu navegador; você pode apagá-los limpando os dados do site.</p>
+    <p>Ao enviar, os dados do formulário são registrados no sistema de atendimento da Mirpo, operado por fornecedores contratados para isso, para que a equipe comercial acompanhe o seu pedido. Em seguida, a mensagem é montada no seu próprio aparelho e enviada pelo WhatsApp ou pelo e-mail, como você escolher. Para agilizar pedidos futuros, nome, telefone, e-mail e cidade podem ficar salvos apenas no seu navegador; você pode apagá-los limpando os dados do site.</p>
     <h2>Cookies e medição</h2>
     <p>Usamos o Google Tag Manager para medir visitas e cliques em botões de contato, de forma agregada. Os vídeos do YouTube e o mapa do Google só carregam quando você clica neles.</p>
     <h2>Seus direitos</h2>
