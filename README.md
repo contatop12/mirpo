@@ -13,7 +13,7 @@ npm run typecheck  # checagem de tipos (tsc)
 npm run cf:dev     # build + servidor local do Cloudflare Workers (http://localhost:8787)
 npm run cf:check   # build + deploy simulado (valida config, _headers e _redirects)
 npm run deploy     # build + publica no Cloudflare Workers (pede login)
-```text
+```
 
 Requer Node 22.18+ (os scripts `.ts` rodam direto no Node, sem transpilar). `.node-version` fixa o Node 24.
 
@@ -37,7 +37,7 @@ As URLs são as mesmas do site antigo (`/pistoes/`, `/a-empresa/` etc.), então 
 
 Ao enviar, o formulário faz duas coisas: registra o pedido e abre o **WhatsApp** (ou o e-mail) com a mensagem pronta.
 
-```
+```text
 navegador ──POST /api/orcamento──▶ Worker (src/worker/index.ts) ──X-Mirpo-Token──▶ n8n ──▶ Pulseboard
 ```
 
