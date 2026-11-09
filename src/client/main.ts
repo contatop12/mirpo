@@ -3,7 +3,7 @@
  */
 import { initEngines } from './engine.ts';
 import { initHeader, initMega, initDrawer, initReveal, initStatus, initCopy } from './ui.ts';
-import { initVideos, initMap, initGallery } from './media.ts';
+import { initVideos, initMap, initGallery, initHeroVideo } from './media.ts';
 import { initForms } from './form.ts';
 import { initAnalytics, initPrefetch } from './analytics.ts';
 
@@ -22,6 +22,7 @@ run('status', initStatus);
 run('engine', initEngines);
 run('reveal', initReveal);
 run('forms', initForms);
+run('hero-video', initHeroVideo);
 run('videos', initVideos);
 run('map', initMap);
 run('gallery', initGallery);

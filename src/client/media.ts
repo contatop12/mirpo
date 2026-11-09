@@ -1,4 +1,67 @@
-import { track } from './util.ts';
+import { reducedMotion, track } from './util.ts';
+
+/* ------------------------------------------------ vídeo de fundo da hero */
+
+type Connection = { saveData?: boolean; effectiveType?: string };
+
+/**
+ * O poster (1º quadro) já está na tela desde o HTML. O vídeo só começa a baixar depois do
+ * `load` + ocioso, para não disputar banda com o conteúdo principal. Fica parado com
+ * movimento reduzido, economia de dados ou rede 2G; pausa fora da tela e tem botão de pausa.
+ */
+export const initHeroVideo = (): void => {
+  const video = document.querySelector<HTMLVideoElement>('.hero__video');
+  const hero = video?.closest<HTMLElement>('.hero');
+  if (!video || !hero) return;
+  const conn = (navigator as Navigator & { connection?: Connection }).connection;
+  if (reducedMotion() || conn?.saveData || /2g$/.test(conn?.effectiveType ?? '')) return;
+
+  const toggle = hero.querySelector<HTMLButtonElement>('.hero__toggle');
+  let userPaused = false;
+  let visible = true;
+  let started = false;
+
+  const play = (): void => {
+    if (started && !userPaused && visible) video.play().catch(() => undefined);
+  };
+
+  const start = (): void => {
+    const portrait = matchMedia('(orientation: portrait)').matches;
+    const src = portrait ? video.dataset.mobile : video.dataset.desktop;
+    if (!src) return;
+    video.src = src;
+    started = true;
+    video.addEventListener(
+      'playing',
+      () => {
+        if (toggle) toggle.hidden = false;
+      },
+      { once: true },
+    );
+    play();
+  };
+
+  toggle?.addEventListener('click', () => {
+    userPaused = !userPaused;
+    // nome fixo ("Pausar o vídeo de fundo") + aria-pressed indica o estado
+    toggle.setAttribute('aria-pressed', String(userPaused));
+    if (userPaused) video.pause();
+    else play();
+  });
+
+  new IntersectionObserver(([entry]) => {
+    visible = !!entry?.isIntersecting;
+    if (visible) play();
+    else video.pause();
+  }).observe(hero);
+
+  const whenIdle = (fn: () => void): void => {
+    if ('requestIdleCallback' in window) requestIdleCallback(fn, { timeout: 3000 });
+    else setTimeout(fn, 1500);
+  };
+  if (document.readyState === 'complete') whenIdle(start);
+  else addEventListener('load', () => whenIdle(start), { once: true });
+};
 
 const preconnected = new Set<string>();
 const preconnect = (href: string): void => {

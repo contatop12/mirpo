@@ -231,6 +231,9 @@ export const headersFile = (): string => `/*
 https://:worker.:subdomain.workers.dev/*
   X-Robots-Tag: noindex
 
+/video/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 

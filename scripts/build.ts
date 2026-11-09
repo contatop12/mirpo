@@ -108,6 +108,21 @@ const copyFonts = async (): Promise<string[]> => {
   return ['/fonts/barlow-400.woff2', '/fonts/big-shoulders-display.woff2'];
 };
 
+/** Vídeos e posters já otimizados (npm run video) → dist/video/<nome>.<hash>.<ext>. */
+const copyVideos = async (): Promise<Record<string, string>> => {
+  const dir = join(ROOT, 'assets-src/video');
+  const out: Record<string, string> = {};
+  for (const f of await readdir(dir).catch(() => [] as string[])) {
+    const m = f.match(/^(.+)\.(mp4|webp)$/);
+    if (!m) continue;
+    const buf = await readFile(join(dir, f));
+    const url = `/video/${m[1]}.${hash(buf)}.${m[2]}`;
+    await write(join(DIST, url), buf);
+    out[f] = url;
+  }
+  return out;
+};
+
 const sizeReport = async (): Promise<void> => {
   const files: { path: string; size: number; gz: number; br: number }[] = [];
   const walk = async (d: string): Promise<void> => {
@@ -139,6 +154,7 @@ const run = async (): Promise<void> => {
   const brand = await brandAssets();
   const assets = await bundle();
   const fonts = await copyFonts();
+  const video = await copyVideos();
 
   const imagesBase = images;
 
@@ -164,7 +180,7 @@ const run = async (): Promise<void> => {
   console.log('▸ páginas');
   const modified = new Date().toISOString();
   const pages = [
-    homePage({ og: ogHome, modified, logoPng: brand.logoPng }),
+    homePage({ og: ogHome, modified, logoPng: brand.logoPng, video }),
     catalogPage({ og: ogCatalog, modified }),
     ...parts.map((p) => partPage(p, { og: ogParts.get(p.slug)!, modified })),
     inst.aboutPage({ og: ogAbout, modified }),

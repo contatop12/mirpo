@@ -27,6 +27,7 @@ const P: Record<string, string> = {
   wheel: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M12 3v6.8M4.3 15.3l5.7-2.2M19.7 15.3l-5.7-2.2"/>',
   wrench: '<path d="M14.5 6.5a4 4 0 0 0 5 5L21 13a6 6 0 0 1-7.6 1.4L7 20.8a2 2 0 0 1-2.8-2.8l6.4-6.4A6 6 0 0 1 12 4l1.5 1.5Z"/>',
   play: '<path d="M8 5.5v13l10.5-6.5Z" fill="currentColor"/>',
+  pause: '<path d="M8.5 5.5v13M15.5 5.5v13" stroke-width="3"/>',
   copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
   external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   chevron: '<path d="m6 9 6 6 6-6"/>',

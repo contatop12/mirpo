@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .cache/
+assets-src/video/original/
 .wrangler/
 .dev.vars*
 .env*

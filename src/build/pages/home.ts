@@ -20,20 +20,37 @@ import {
 import { organization, website, webPage, faqPage, videoObject } from '../schema.ts';
 import type { Page } from '../layout.ts';
 
-export const homePage = (ctx: { og: string; modified: string; logoPng: string }): Page => {
+export const homePage = (ctx: { og: string; modified: string; logoPng: string; video?: Record<string, string> }): Page => {
   const years = yearsActive();
+
+  // Vídeo de fundo da hero (Reels do estoque da Mirpo, ver scripts/video.ts). Horizontal para
+  // telas deitadas, vertical para telas em pé. O poster (1º quadro) aparece na hora e é o LCP;
+  // o vídeo só carrega depois, pelo JS (src/client/media.ts → initHeroVideo).
+  const v = ctx.video ?? {};
+  const bg =
+    v['hero-desktop.mp4'] && v['hero-desktop.webp'] && v['hero-mobile.mp4'] && v['hero-mobile.webp']
+      ? { desktop: v['hero-desktop.mp4'], desktopPoster: v['hero-desktop.webp'], mobile: v['hero-mobile.mp4'], mobilePoster: v['hero-mobile.webp'] }
+      : null;
+  const heroMedia = bg
+    ? html`<div class="hero__media">
+    <video class="hero__video" muted loop playsinline preload="none" disablepictureinpicture disableremoteplayback tabindex="-1" aria-hidden="true" data-desktop="${bg.desktop}" data-desktop-poster="${bg.desktopPoster}" data-mobile="${bg.mobile}" data-mobile-poster="${bg.mobilePoster}"></video>
+    <script>{const v=document.currentScript.previousElementSibling;v.poster=matchMedia('(orientation: portrait)').matches?v.dataset.mobilePoster:v.dataset.desktopPoster}</script>
+  </div>
+  <button class="hero__toggle" type="button" aria-pressed="false" hidden>${icon('pause', 'icon icon--pause')}${icon('play', 'icon icon--play')}<span class="sr-only">Pausar o vídeo de fundo</span></button>`
+    : '';
   const title = 'Mirpo | Peças para motores linha leve e pesada em SP';
   const description = `Distribuidora de peças para motores em São Paulo desde 1968. Pistões, bronzinas, válvulas, juntas e kits originais à pronta entrega. Peça orçamento.`;
 
   const body = html`
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero${bg ? ' hero--video' : ''}" aria-labelledby="hero-title">
+  ${heroMedia}
   <div class="wrap hero__grid">
     <div class="hero__copy">
       <h1 class="hero__title" id="hero-title">Peças para motores em geral, linha leve e pesada</h1>
       <p class="hero__lede">Pistões, bronzinas, válvulas, juntas e tudo o que vai dentro do motor, das principais fabricantes e à pronta entrega. Atendemos retíficas, oficinas e autopeças em São Paulo desde 1968.</p>
       <div class="hero__actions">
         <a class="btn btn--signal btn--lg" href="${whatsappLink()}" data-track="whatsapp-hero">${icon('whatsapp')}Pedir orçamento no WhatsApp</a>
-        <a class="btn btn--ghost btn--lg" href="#catalogo">Ver as peças</a>
+        <a class="btn ${bg ? 'btn--on-dark' : 'btn--ghost'} btn--lg" href="#catalogo">Ver as peças</a>
       </div>
       <ul class="hero__proof" role="list">
         <li>${icon('shield')}Peças originais, com nota fiscal</li>
@@ -147,6 +164,12 @@ ${quoteForm()}
     ogImageAlt: 'Mecânico montando pistões em um bloco de motor — Mirpo, peças para motores desde 1968',
     nav: 'home',
     bodyClass: 'page-home',
+    preload: bg
+      ? [
+          html`<link rel="preload" as="image" type="image/webp" href="${bg.desktopPoster}" media="(orientation: landscape)" fetchpriority="high">`,
+          html`<link rel="preload" as="image" type="image/webp" href="${bg.mobilePoster}" media="(orientation: portrait)" fetchpriority="high">`,
+        ]
+      : [],
     sitemap: { priority: 1, changefreq: 'weekly' },
     images: ['banners/hero-mecanico.jpg', 'banners/fachada-loja.jpg', 'empresa/fachada-antiga.jpg', 'banners/carros-antigos.png'],
     schema: [

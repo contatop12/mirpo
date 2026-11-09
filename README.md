@@ -10,6 +10,7 @@ npm run build      # gera dist/ (páginas, imagens, sitemap, robots, llms)
 npm run preview    # serve dist/ em http://localhost:4321
 npm run dev        # rebuild automático ao salvar + servidor local
 npm run typecheck  # checagem de tipos (tsc)
+npm run video      # recorta e comprime o vídeo da hero (precisa do ffmpeg; só quando o vídeo mudar)
 npm run cf:dev     # build + servidor local do Cloudflare Workers (http://localhost:8787)
 npm run cf:check   # build + deploy simulado (valida config, _headers e _redirects)
 npm run deploy     # build + publica no Cloudflare Workers (pede login)
@@ -30,6 +31,7 @@ Requer Node 22.18+ (os scripts `.ts` rodam direto no Node, sem transpilar). `.no
 | Interações (motor, menu, formulário, vídeos, mapa) | `src/client/*.ts` |
 | Desenho do motor em corte | `src/build/engine-svg.ts` + `src/shared/engine.ts` |
 | Imagens originais | `assets-src/images/` (o build gera AVIF e WebP) |
+| Vídeo de fundo da hero | `scripts/video.ts` → `assets-src/video/` (ver abaixo) |
 
 As URLs são as mesmas do site antigo (`/pistoes/`, `/a-empresa/` etc.), então o histórico de SEO é preservado.
 
@@ -84,3 +86,13 @@ Cada push na `main` gera build e publica. O primeiro build leva ~2–3 min (gera
 4. Enviar `https://mirpo.com.br/sitemap.xml` no Google Search Console e no Bing Webmaster Tools.
 
 **Outras hospedagens** — envie o conteúdo de `dist/`. Cloudflare Pages/Netlify: comando `npm run build`, pasta `dist`. Apache/cPanel usa o `.htaccess` gerado.
+
+## Vídeo de fundo da hero
+
+Vem do Reels da própria Mirpo ([instagram.com/p/DYp7SqQjm5K](https://www.instagram.com/p/DYp7SqQjm5K/)). O original fica em `assets-src/video/original/`, fora do git.
+`npm run video` usa só os trechos sem texto (7,3–11,7 s e 14,3–18,2 s, sem a tela final do logo) e gera um loop de ~8 s, sem áudio:
+
+- `hero-desktop.mp4` (720×400, faixa horizontal) e `hero-mobile.mp4` (432×768, vertical), cerca de 550 kB e 450 kB;
+- `hero-*.webp`: poster com o 1º quadro, pré-carregado. Ele aparece na hora e é o LCP da home.
+
+O vídeo só baixa depois que a página termina de carregar. Ele não toca para quem ativou "reduzir movimento" no sistema, nem com economia de dados ou rede 2G (aí fica o poster parado), pausa quando sai da tela e tem botão de pausar.

@@ -15,7 +15,8 @@
     "images": "node scripts/build.ts --images-only",
     "deploy": "wrangler deploy",
     "cf:dev": "wrangler dev",
-    "cf:check": "wrangler deploy --dry-run"
+    "cf:check": "wrangler deploy --dry-run",
+    "video": "node scripts/video.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
