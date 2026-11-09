@@ -124,7 +124,7 @@ const topbar = (): Safe => html`<div class="topbar">
 const header = (active?: string, logo = ''): Safe => html`<header class="header" data-header>
   <div class="wrap header__inner">
     <a class="header__logo" href="/" aria-label="Mirpo, página inicial">
-      <img src="${logo}" alt="Mirpo — distribuidor de peças para motores em geral" width="180" height="79">
+      <img src="${logo}" alt="Mirpo — distribuidor de peças para motores em geral" width="180" height="78">
     </a>
     <nav class="nav" aria-label="Principal">
       <ul class="nav__list">
@@ -174,7 +174,7 @@ const footer = (logoWhite: string): Safe => {
   return html`<footer class="footer">
   <div class="wrap footer__grid">
     <div class="footer__brand">
-      <img src="${logoWhite}" alt="Mirpo" width="200" height="88" loading="lazy">
+      <img src="${logoWhite}" alt="Mirpo" width="200" height="87" loading="lazy">
       <p>Distribuidora de peças para motores em geral, linha leve e pesada. Em São Paulo desde 1968.</p>
       <ul class="social">
         <li><a href="${business.social.instagram}" rel="noopener" target="_blank">${icon('instagram')}<span class="sr-only">Instagram da Mirpo</span></a></li>

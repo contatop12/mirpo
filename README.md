@@ -32,6 +32,7 @@ Requer Node 22.18+ (os scripts `.ts` rodam direto no Node, sem transpilar). `.no
 | Desenho do motor em corte | `src/build/engine-svg.ts` + `src/shared/engine.ts` |
 | Imagens originais | `assets-src/images/` (o build gera AVIF e WebP) |
 | Vídeo de fundo da hero | `scripts/video.ts` → `assets-src/video/` (ver abaixo) |
+| Logo | `assets-src/brand/logo.svg` (fundos claros: azul `#1003A7` + cinza), `logo-branco.svg` (fundos escuros), `icon.svg` (o "M" dos favicons). Vetorizadas da logo oficial `logo-original.png` |
 
 As URLs são as mesmas do site antigo (`/pistoes/`, `/a-empresa/` etc.), então o histórico de SEO é preservado.
 

@@ -23,20 +23,22 @@ const write = async (path: string, content: string | Buffer): Promise<void> => {
   await writeFile(path, content);
 };
 
+/** Azul da marca (logo oficial: assets-src/brand/logo-original.png). */
+const BRAND_BLUE = '#1003a7';
+
 const brandAssets = async (): Promise<{ logo: string; logoWhite: string; logoPng: string; logoBuf: Buffer }> => {
-  const svg = await readFile(join(ROOT, 'assets-src/brand/logo.svg'), 'utf8');
+  // logo.svg = fundos claros (azul + cinza); logo-branco.svg = fundos escuros. Vetorizadas da logo oficial.
+  const navy = await readFile(join(ROOT, 'assets-src/brand/logo.svg'), 'utf8');
+  const white = await readFile(join(ROOT, 'assets-src/brand/logo-branco.svg'), 'utf8');
   const icon = await readFile(join(ROOT, 'assets-src/brand/icon.svg'), 'utf8');
   const colored = (s: string, color: string): string => s.replace('<path ', `<path fill="${color}" `);
-  const navy = colored(svg, '#283378');
-  const white = colored(svg, '#ffffff');
   const hn = hash(navy);
   const hw = hash(white);
   await write(join(DIST, `brand/logo.${hn}.svg`), navy);
   await write(join(DIST, `brand/logo-branco.${hw}.svg`), white);
 
   // favicons e ícones do PWA a partir do "M"
-  const iconNavy = colored(icon, '#283378');
-  await write(join(DIST, 'favicon.svg'), iconNavy.replace('<svg ', '<svg width="32" height="32" '));
+  await write(join(DIST, 'favicon.svg'), colored(icon, BRAND_BLUE).replace('<svg ', '<svg width="32" height="32" '));
   const square = async (size: number, pad: number, bg: string, fg: string): Promise<Buffer> => {
     const inner = Math.round(size * (1 - pad * 2));
     const glyph = await sharp(Buffer.from(colored(icon, fg)), { density: 600 }).resize(inner, inner, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
@@ -45,11 +47,11 @@ const brandAssets = async (): Promise<{ logo: string; logoWhite: string; logoPng
       .png({ compressionLevel: 9 })
       .toBuffer();
   };
-  await write(join(DIST, 'apple-touch-icon.png'), await square(180, 0.18, '#ffffff', '#283378'));
-  await write(join(DIST, 'icon-192.png'), await square(192, 0.16, '#ffffff', '#283378'));
-  await write(join(DIST, 'icon-512.png'), await square(512, 0.16, '#ffffff', '#283378'));
-  await write(join(DIST, 'icon-maskable-512.png'), await square(512, 0.26, '#283378', '#ffffff'));
-  const ico32 = await square(32, 0.08, '#ffffff', '#283378');
+  await write(join(DIST, 'apple-touch-icon.png'), await square(180, 0.18, '#ffffff', BRAND_BLUE));
+  await write(join(DIST, 'icon-192.png'), await square(192, 0.16, '#ffffff', BRAND_BLUE));
+  await write(join(DIST, 'icon-512.png'), await square(512, 0.16, '#ffffff', BRAND_BLUE));
+  await write(join(DIST, 'icon-maskable-512.png'), await square(512, 0.26, BRAND_BLUE, '#ffffff'));
+  const ico32 = await square(32, 0.08, '#ffffff', BRAND_BLUE);
   // ICO com PNG embutido (suportado por todos os navegadores atuais)
   const header = Buffer.alloc(22);
   header.writeUInt16LE(0, 0);
