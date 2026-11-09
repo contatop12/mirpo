@@ -2965,13 +2965,19 @@ main:focus {
   text-decoration: underline;
 }
 
+.footer__bottom p {
+  margin: 0;
+}
+
 .footer__bottom {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: baseline;
   gap: 0.5rem 2rem;
   margin-top: clamp(2.5rem, 5vw, 4rem);
-  padding-block: 1.5rem;
+  /* embaixo: altura + distância do botão flutuante, para ele não cobrir o crédito */
+  padding-block: 1.5rem calc(58px + clamp(1rem, 2.5vw, 1.75rem) + 1rem);
   border-top: 1px solid rgb(255 255 255 / 0.12);
   font-size: var(--step--1);
   color: rgb(255 255 255 / 0.6);
@@ -3224,6 +3230,9 @@ main:focus {
   }
   .fab {
     display: none;
+  }
+  .footer__bottom {
+    padding-bottom: 1.5rem;
   }
   .actionbar {
     position: fixed;
