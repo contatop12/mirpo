@@ -1,21 +1,79 @@
 /**
  * Worker do site Mirpo. Os arquivos estáticos (dist/) são servidos direto pela Cloudflare;
- * este código só roda em /api/* (ver `run_worker_first` no wrangler.jsonc).
+ * este código só roda em /api/* e /video/* (ver `run_worker_first` no wrangler.jsonc).
  *
  * POST /api/orcamento → valida o pedido do formulário e repassa ao n8n
  * (fluxo "P12 Mirpo — Formulário de Orçamento (Site)", que envia ao Pulseboard).
  * O endereço e o token do n8n ficam só no servidor: N8N_WEBHOOK_URL (vars) e N8N_WEBHOOK_TOKEN (secret).
+ *
+ * /video/* → mesmo arquivo dos assets, mas atendendo `Range` com 206 (o Safari só toca vídeo
+ * assim; os assets estáticos respondem 200 com o arquivo inteiro).
  */
 
 interface RateLimit {
   limit(options: { key: string }): Promise<{ success: boolean }>;
 }
 
+interface Assets {
+  fetch(input: Request | string, init?: RequestInit): Promise<Response>;
+}
+
 interface Env {
+  ASSETS: Assets;
   N8N_WEBHOOK_URL?: string;
   N8N_WEBHOOK_TOKEN?: string;
   LEADS_RATE?: RateLimit;
 }
+
+const VIDEO_CACHE = 'public, max-age=31536000, immutable';
+
+const serveVideo = async (request: Request, env: Env): Promise<Response> => {
+  if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 405, headers: { allow: 'GET, HEAD' } });
+  const range = request.headers.get('range');
+  const m = range?.match(/^bytes=(\d*)-(\d*)$/);
+
+  // Sem Range (ou Range com vários trechos): resposta normal dos assets, avisando que aceita Range
+  if (!m || (m[1] === '' && m[2] === '')) {
+    const res = await env.ASSETS.fetch(request);
+    const out = new Response(res.body, res);
+    out.headers.set('accept-ranges', 'bytes');
+    out.headers.set('cache-control', res.ok || res.status === 304 ? VIDEO_CACHE : 'no-store');
+    return out;
+  }
+
+  const full = await env.ASSETS.fetch(new Request(request.url, { method: 'GET' }));
+  if (!full.ok) {
+    const out = new Response(full.body, full);
+    out.headers.set('cache-control', 'no-store');
+    return out;
+  }
+  const buf = await full.arrayBuffer();
+  const size = buf.byteLength;
+  let start: number;
+  let end: number;
+  if (m[1] === '') {
+    // "bytes=-500": últimos 500 bytes
+    start = Math.max(0, size - Number(m[2]));
+    end = size - 1;
+  } else {
+    start = Number(m[1]);
+    end = m[2] === '' ? size - 1 : Math.min(Number(m[2]), size - 1);
+  }
+  if (start >= size || start > end) {
+    return new Response(null, { status: 416, headers: { 'content-range': `bytes */${size}`, 'accept-ranges': 'bytes' } });
+  }
+  const headers = new Headers({
+    'content-type': full.headers.get('content-type') ?? 'video/mp4',
+    'content-length': String(end - start + 1),
+    'content-range': `bytes ${start}-${end}/${size}`,
+    'accept-ranges': 'bytes',
+    'cache-control': VIDEO_CACHE,
+    'x-content-type-options': 'nosniff',
+  });
+  const etag = full.headers.get('etag');
+  if (etag) headers.set('etag', etag);
+  return new Response(request.method === 'HEAD' ? null : buf.slice(start, end + 1), { status: 206, headers });
+};
 
 const MAX_BODY = 16_000;
 
@@ -106,6 +164,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const { pathname } = new URL(request.url);
     if (pathname === '/api/orcamento') return handleQuote(request, env);
+    if (pathname.startsWith('/video/')) return serveVideo(request, env);
     return json(404, { ok: false, motivo: 'não encontrado' });
   },
 };

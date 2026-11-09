@@ -17,8 +17,9 @@
     "html_handling": "auto-trailing-slash",
     // URL inexistente → dist/404.html com status 404
     "not_found_handling": "404-page",
-    // Só /api/* executa o Worker; o resto sai direto dos arquivos estáticos
-    "run_worker_first": ["/api/*"]
+    // Só /api/* e /video/* (Range para o Safari) executam o Worker; o resto sai direto dos arquivos estáticos
+    "run_worker_first": ["/api/*", "/video/*"],
+    "binding": "ASSETS"
   },
   "vars": {
     // Fluxo n8n "P12 Mirpo — Formulário de Orçamento (Site)". O token vai no secret N8N_WEBHOOK_TOKEN.
