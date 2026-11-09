@@ -7,13 +7,28 @@ export const initHeader = (): void => {
   const fab = document.querySelector<HTMLElement>('[data-fab]');
   if (!header) return;
   let lastY = window.scrollY;
+
+  // O botão flutuante sai de cena quando o fim do rodapé (copyright + crédito) se aproxima,
+  // para não cobrir o texto; o rodapé já tem WhatsApp e telefone.
+  let nearEnd = false;
+  const footEnd = document.querySelector('.footer__bottom');
+  if (fab && footEnd) {
+    new IntersectionObserver(
+      ([entry]) => {
+        nearEnd = !!entry?.isIntersecting;
+        fab.classList.toggle('is-visible', window.scrollY > 640 && !nearEnd);
+      },
+      { rootMargin: '0px 0px 140px 0px' },
+    ).observe(footEnd);
+  }
+
   onFrame((y) => {
     const dy = y - lastY;
     header.classList.toggle('is-scrolled', y > 8);
     const busy = document.querySelector('[data-mega-root].is-open, .drawer.is-open');
     if (y < 320 || dy < -6 || busy) header.classList.remove('is-hidden');
     else if (dy > 6) header.classList.add('is-hidden');
-    fab?.classList.toggle('is-visible', y > 640);
+    fab?.classList.toggle('is-visible', y > 640 && !nearEnd);
     lastY = y;
   });
 };
