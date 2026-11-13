@@ -4,7 +4,9 @@
  *
  * POST /api/orcamento → valida o pedido do formulário e repassa ao n8n
  * (fluxo "P12 Mirpo — Formulário de Orçamento (Site)", que envia ao Pulseboard).
- * O endereço e o token do n8n ficam só no servidor: N8N_WEBHOOK_URL (vars) e N8N_WEBHOOK_TOKEN (secret).
+ * Endereço do webhook em N8N_WEBHOOK_URL (vars). O webhook não pede senha; se o secret
+ * N8N_WEBHOOK_TOKEN for cadastrado, ele vai junto no header X-Mirpo-Token (para religar a
+ * autenticação no n8n sem mexer no código).
  *
  * /video/* → mesmo arquivo dos assets, mas atendendo `Range` com 206 (o Safari só toca vídeo
  * assim; os assets estáticos respondem 200 com o arquivo inteiro).
@@ -142,12 +144,15 @@ const handleQuote = async (request: Request, env: Env): Promise<Response> => {
     return json(422, { ok: false, motivo: 'nome ou telefone inválido' });
   }
 
-  if (!env.N8N_WEBHOOK_URL || !env.N8N_WEBHOOK_TOKEN) return json(503, { ok: false, motivo: 'recebimento não configurado' });
+  if (!env.N8N_WEBHOOK_URL) return json(503, { ok: false, motivo: 'recebimento não configurado' });
+
+  const headers: Record<string, string> = { 'content-type': 'application/json' };
+  if (env.N8N_WEBHOOK_TOKEN) headers['x-mirpo-token'] = env.N8N_WEBHOOK_TOKEN;
 
   try {
     const res = await fetch(env.N8N_WEBHOOK_URL, {
       method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-mirpo-token': env.N8N_WEBHOOK_TOKEN },
+      headers,
       body: JSON.stringify(lead),
       signal: AbortSignal.timeout(10_000),
     });

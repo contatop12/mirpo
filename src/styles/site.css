@@ -2224,6 +2224,94 @@ main:focus {
   color: var(--steel);
 }
 
+.form__error a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* envio em andamento: troca o ícone por um giro e trava novos cliques */
+.btn__spin {
+  display: none;
+  width: 1.1em;
+  height: 1.1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.btn.is-busy {
+  cursor: progress;
+}
+
+.btn.is-busy .btn__spin {
+  display: inline-block;
+}
+
+.btn.is-busy .icon {
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* confirmação no lugar dos campos depois do envio */
+.form.is-sent > :not(.form-done) {
+  display: none;
+}
+
+.form-done {
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  padding-block: clamp(1.5rem, 6vw, 3.5rem);
+  text-align: center;
+  animation: fade 0.4s var(--ease) both;
+}
+
+.form-done[hidden] {
+  display: none;
+}
+
+.form-done__icon {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: rgb(63 191 127 / 0.16);
+  color: #1d7f4f;
+}
+
+.form-done__icon .icon {
+  width: 2rem;
+  height: 2rem;
+  stroke-width: 2.6;
+}
+
+.form-done__title {
+  font-size: var(--step-3);
+  line-height: 1;
+  color: var(--ink);
+}
+
+.form-done__title:focus {
+  outline: none;
+}
+
+.form-done__text {
+  max-width: 46ch;
+  color: var(--steel);
+}
+
+.form-done .btn {
+  margin-top: 0.5rem;
+}
+
 /* -------------------------------------------------------------- CTA band */
 
 .cta-band {

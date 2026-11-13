@@ -9,17 +9,26 @@ export const initHeader = (): void => {
   let lastY = window.scrollY;
 
   // O botão flutuante sai de cena quando o fim do rodapé (copyright + crédito) se aproxima,
-  // para não cobrir o texto; o rodapé já tem WhatsApp e telefone.
+  // para não cobrir o texto (o rodapé já tem WhatsApp e telefone), e enquanto o formulário de
+  // orçamento está na tela (não cobre a mensagem de erro nem disputa com o "Enviar pedido").
   let nearEnd = false;
-  const footEnd = document.querySelector('.footer__bottom');
-  if (fab && footEnd) {
-    new IntersectionObserver(
-      ([entry]) => {
-        nearEnd = !!entry?.isIntersecting;
+  const covered = [document.querySelector('.footer__bottom'), ...document.querySelectorAll('[data-quote-form]')].filter(
+    (el): el is Element => !!el,
+  );
+  if (fab && covered.length) {
+    const seen = new Set<Element>();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          if (en.isIntersecting) seen.add(en.target);
+          else seen.delete(en.target);
+        }
+        nearEnd = seen.size > 0;
         fab.classList.toggle('is-visible', window.scrollY > 640 && !nearEnd);
       },
       { rootMargin: '0px 0px 140px 0px' },
-    ).observe(footEnd);
+    );
+    covered.forEach((el) => io.observe(el));
   }
 
   onFrame((y) => {

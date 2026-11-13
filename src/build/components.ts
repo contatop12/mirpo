@@ -166,13 +166,18 @@ export const quoteForm = (o: { id?: string; preset?: string[]; title?: string; l
         </fieldset>
         <label class="field"><span class="field__label">Mensagem <em>opcional</em></span><textarea name="mensagem" rows="3" maxlength="1200" placeholder="Medida, código da peça, quantidade…"></textarea></label>
         <label class="hp" aria-hidden="true">Não preencha<input name="empresa_site" tabindex="-1" autocomplete="off"></label>
-        <label class="consent"><input type="checkbox" name="consentimento" required><span>Autorizo a Mirpo a usar estes dados para responder ao meu pedido, conforme a <a href="/politica-de-privacidade/">política de privacidade</a>.</span></label>
+        <label class="consent"><input type="checkbox" name="consentimento" required checked><span>Autorizo a Mirpo a usar estes dados para responder ao meu pedido, conforme a <a href="/politica-de-privacidade/">política de privacidade</a>.</span></label>
         <p class="form__error" data-form-error role="alert" hidden></p>
         <div class="form__actions">
-          <button class="btn btn--signal btn--lg" type="submit" value="whatsapp">${icon('whatsapp')}Enviar pelo WhatsApp</button>
-          <button class="btn btn--ghost" type="submit" value="email">${icon('mail')}Enviar por e-mail</button>
+          <button class="btn btn--signal btn--lg" type="submit" data-submit>${icon('send')}<span class="btn__spin" aria-hidden="true"></span><span data-submit-label>Enviar pedido</span></button>
         </div>
-        <p class="form__note">O WhatsApp abre com a mensagem pronta. É só confirmar o envio.</p>
+        <p class="form__note">Um especialista da Mirpo responde em horário comercial, pelo telefone ou e-mail que você informar.</p>
+        <div class="form-done" data-form-done hidden>
+          <span class="form-done__icon">${icon('check')}</span>
+          <h3 class="form-done__title" tabindex="-1" data-form-done-title>Pedido enviado com sucesso!</h3>
+          <p class="form-done__text">Recebemos o seu pedido de orçamento. Um especialista da Mirpo entra em contato em horário comercial, pelo telefone ou e-mail que você informou.</p>
+          <button class="btn btn--ghost" type="button" data-form-again>Enviar outro pedido</button>
+        </div>
       </form>
     </div>
   </section>`;
